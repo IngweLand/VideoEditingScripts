@@ -1,0 +1,7 @@
+ffmpeg -y -vsync 0 -hwaccel cuda -hwaccel_output_format cuda -i "input.mp4" -vf scale_cuda=1920:-1 -preset p7 -c:v hevc_nvenc -b:v 30M -bufsize 15M -maxrate 30M -an -sn -dn "temp_output.mp4"
+ffmpeg -y -vsync 0 -i "temp_output.mp4" -vf "lut3d=dji_vivid.cube" -profile:v main -pix_fmt yuv420p -preset p7 -c:v hevc_nvenc -b:v 20M -bufsize 10M -maxrate 30M "output.mp4"
+ffprobe -v quiet -print_format json -show_streams -show_format -i "input.mp4"
+ffmpeg -i "input.mp4" -map 0:d:0 -f data "output0.bin"
+ffmpeg -i "input.mp4" -map 0:d:1 -f data "output1.bin"
+ffmpeg -i "input.mp4" -map 0:3 "output_image_%04d.jpg"
+protoc --decode_raw < "output0.bin" > "output0.txt"
